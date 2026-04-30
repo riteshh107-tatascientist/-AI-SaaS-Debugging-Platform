@@ -1,0 +1,31 @@
+log_text,category
+ModuleNotFoundError: No module named 'numpy',Dependency
+ModuleNotFoundError: No module named 'pandas',Dependency
+ModuleNotFoundError: No module named 'sklearn',Dependency
+ImportError: cannot import name 'DataFrame',Dependency
+ERROR: Could not find a version that satisfies the requirement tensorflow,Dependency
+ERROR: No matching distribution found for torch,Dependency
+SyntaxError: invalid syntax,Syntax
+IndentationError: unexpected indent,Syntax
+IndentationError: expected an indented block,Syntax
+TypeError: unsupported operand type(s),Syntax
+Permission denied: '/usr/bin/python',Environment
+Permission denied: '/app/run.sh',Environment
+OSError: [Errno 13] Permission denied,Environment
+FileNotFoundError: No such file or directory,Environment
+pip: command not found,Environment
+gcc: command not found,Environment
+npm ERR! missing script: start,Build
+npm ERR! failed to compile,Build
+Error: ENOENT no such file or directory,Build
+Docker build failed,Build
+Error response from daemon: pull access denied,Build
+Segmentation fault (core dumped),Runtime
+Killed process due to out of memory,Runtime
+RuntimeError: CUDA out of memory,Runtime
+Connection timed out,Network
+Failed to connect to database,Network
+TimeoutError: request timed out,Network
+Authentication failed for user,Auth
+Invalid credentials provided,Auth
+Access denied for user,Auth
