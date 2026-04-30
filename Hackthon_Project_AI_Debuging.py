@@ -185,7 +185,7 @@ page = st.sidebar.radio("Navigation", [
 @st.cache_resource
 def load_model():
     m = DebugModel()
-    m.train(r"D:\AI_Debbuing_system\data\error_logs_dataset.csv")
+    m.train("data/error_logs_dataset.csv")
     return m
 
 model = load_model()

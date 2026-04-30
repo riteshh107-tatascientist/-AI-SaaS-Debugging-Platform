@@ -109,7 +109,7 @@ def extract_var(log):
 if __name__ == "__main__":
     model = DebugModel()
 
-    model.train(r"D:\AI_Debbuing_system\data\error_logs_dataset.csv")
+    model.train("data/error_logs_dataset.csv")
 
     test_log = "ModuleNotFoundError: No module named 'numpy'"
 
