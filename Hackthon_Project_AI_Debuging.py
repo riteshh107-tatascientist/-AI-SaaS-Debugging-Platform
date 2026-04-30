@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import re
 import time
+
 from auth import ensure_admin
 
 from analytics import get_login_stats
@@ -23,6 +24,7 @@ from utils import format_out
 st.set_page_config(page_title="DebugAI Pro", layout="wide")
 create_table()
 ensure_admin()
+
 # ---------------- AUTO REFRESH ----------------
 st.query_params["refresh"] = str(time.time())
 
@@ -36,7 +38,6 @@ if "user" not in st.session_state:
 st.markdown("""
 <style>
 
-/* BACKGROUND */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg,#0f172a,#1e3a8a,#9333ea,#020617);
     background-size: 400% 400%;
@@ -49,7 +50,7 @@ st.markdown("""
     100% {background-position:0% 50%;}
 }
 
-/* 🔥 PREMIUM TOP BAR */
+/* TOP BAR */
 .topbar {
     width: 100%;
     height: 70px;
@@ -76,8 +77,6 @@ st.markdown("""
     0% {transform: translateX(100%);}
     100% {transform: translateX(-100%);}
 }
-
-
 
 /* CARDS */
 .card {
@@ -120,8 +119,6 @@ st.markdown("""
     -webkit-text-fill-color: transparent;
     animation: moveText 15s linear infinite;
 }
-
-   
 
 </style>
 """, unsafe_allow_html=True)
@@ -172,6 +169,13 @@ if not st.session_state.login:
 
 st.markdown(f"👤 Logged in as: **{st.session_state.user}**")
 
+admin_user = st.secrets["ADMIN_USERNAME"]
+
+if st.session_state.user == admin_user:
+    st.success("👑 Welcome Owner! Full system access granted 🚀")
+else:
+    st.info("👤 Welcome user! Explore the system")
+
 # ---------------- NAV ----------------
 page = st.sidebar.radio("Navigation", [
     "🏠 Dashboard",
@@ -194,10 +198,7 @@ def extract_errors(text):
     return list(set(re.findall(r".*Error.*|.*Exception.*", text)))
 
 # =====================================================
-# 🏠 DASHBOARD (FULL FILLED)
-# =====================================================
-# =====================================================
-# 🏠 DASHBOARD (STARTUP LANDING PAGE)
+# 🏠 DASHBOARD
 # =====================================================
 if page == "🏠 Dashboard":
 
@@ -208,91 +209,22 @@ if page == "🏠 Dashboard":
     banned = sum(1 for u in users if u[1] == 1)
     deleted = sum(1 for u in users if u[2] == 1)
 
-    # 🔥 HERO SECTION
     st.markdown("""
     <div class='card' style='padding:40px'>
-        <h1 style='font-size:40px'>🚀 DebugAI Pro</h1>
-        <p style='font-size:18px'>
-        AI-powered debugging SaaS platform to analyze logs, monitor users,
-        and solve errors in real-time like a professional system.
-        </p>
-        <hr>
-        <b>⚡ Fast | 🤖 Smart | 📊 Real-time | 🔐 Secure</b>
+        <h1>🚀 DebugAI Pro</h1>
+        <p>AI debugging SaaS platform</p>
     </div>
     """, unsafe_allow_html=True)
 
-    # 🔥 STATS
     col1, col2, col3 = st.columns(3)
+    col1.markdown(f"<div class='card'>Users<br><h2>{total_users}</h2></div>", unsafe_allow_html=True)
+    col2.markdown(f"<div class='card'>Banned<br><h2>{banned}</h2></div>", unsafe_allow_html=True)
+    col3.markdown(f"<div class='card'>Deleted<br><h2>{deleted}</h2></div>", unsafe_allow_html=True)
 
-    col1.markdown(f"<div class='card'>👥 Total Users<br><h2>{total_users}</h2></div>", unsafe_allow_html=True)
-    col2.markdown(f"<div class='card'>🚫 Banned Users<br><h2>{banned}</h2></div>", unsafe_allow_html=True)
-    col3.markdown(f"<div class='card'>🗑 Deleted Users<br><h2>{deleted}</h2></div>", unsafe_allow_html=True)
-
-    # 🔥 FEATURES SECTION
-    st.subheader("🔥 Platform Features")
-
-    f1, f2, f3 = st.columns(3)
-
-    f1.markdown("""
-    <div class='card'>
-    🤖 AI Log Analyzer<br><br>
-    Detect errors automatically and get instant fixes.
-    </div>
-    """, unsafe_allow_html=True)
-
-    f2.markdown("""
-    <div class='card'>
-    💬 Smart AI Assistant<br><br>
-    Ask questions and get step-by-step solutions.
-    </div>
-    """, unsafe_allow_html=True)
-
-    f3.markdown("""
-    <div class='card'>
-    👑 Admin Control System<br><br>
-    Ban, delete, restore users like Instagram.
-    </div>
-    """, unsafe_allow_html=True)
-
-    f4, f5, f6 = st.columns(3)
-
-    f4.markdown("""
-    <div class='card'>
-    📊 Real-Time Analytics<br><br>
-    Track user activity and login trends live.
-    </div>
-    """, unsafe_allow_html=True)
-
-    f5.markdown("""
-    <div class='card'>
-    📄 PDF Reports<br><br>
-    Export debugging reports instantly.
-    </div>
-    """, unsafe_allow_html=True)
-
-    f6.markdown("""
-    <div class='card'>
-    🚨 Email Alerts<br><br>
-    Get alerts when critical errors occur.
-    </div>
-    """, unsafe_allow_html=True)
-
-    # 🔥 ANALYTICS PREVIEW
-    st.subheader("📈 Live System Analytics")
     st.line_chart(get_login_stats())
 
-    # 🔥 RECENT ACTIVITY
-    st.subheader("⚡ Recent Activity Feed")
-    df = pd.DataFrame(activity, columns=["User","Action","Time"])
-    st.dataframe(df.tail(10))
+    st.dataframe(pd.DataFrame(activity, columns=["User","Action","Time"]))
 
-    # 🔥 FINAL CTA SECTION
-    st.markdown("""
-    <div class='card' style='padding:30px'>
-    <h3>🚀 Ready to Debug Smarter?</h3>
-    Use the Log Analyzer or AI Assistant to start solving issues now.
-    </div>
-    """, unsafe_allow_html=True)
 # =====================================================
 # 📄 LOG ANALYZER
 # =====================================================
@@ -308,15 +240,12 @@ elif page == "📄 Log Analyzer":
         log += manual
 
     if st.button("Analyze"):
-
         errors = extract_errors(log)
 
         for e in errors:
-
             cat, sol = rule_fix(e)
 
             send_alert("DebugAI Alert", f"{st.session_state.user}: {e}")
-
             log_activity(st.session_state.user, "LOG_ANALYZED")
 
             st.markdown(f"""
@@ -344,20 +273,20 @@ elif page == "💬 AI Assistant":
 # =====================================================
 elif page == "📊 Analytics":
 
-    st.subheader("📈 Login Stats")
     st.line_chart(get_login_stats())
 
-    st.subheader("📊 Activity Logs")
     st.dataframe(pd.DataFrame(get_activity(),
                               columns=["User","Action","Time"]))
 
 # =====================================================
-# 👑 ADMIN PANEL
+# 👑 ADMIN PANEL (FIXED)
 # =====================================================
 elif page == "👑 Admin Panel":
 
-    if st.session_state.user != "admin":
-        st.error("Access Denied")
+    admin_user = st.secrets["ADMIN_USERNAME"]
+
+    if st.session_state.user != admin_user:
+        st.error("🚫 Access Denied")
         st.stop()
 
     st.subheader("👑 Admin Control Center")
