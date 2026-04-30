@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import re
 import time
+from ai_engine import ai_fix_code
+from github_ai import fetch_repo
 
 from auth import ensure_admin
 
@@ -259,15 +261,56 @@ elif page == "📄 Log Analyzer":
 # =====================================================
 # 💬 AI ASSISTANT
 # =====================================================
+# =====================================================
+# 💬 AI ASSISTANT (UPGRADED)
+# =====================================================
 elif page == "💬 AI Assistant":
 
-    q = st.text_input("Ask issue")
+    st.title("🧠 Senior Developer AI System")
 
-    if st.button("Ask"):
-        ans = rule_fix(q)[1]
-        render_chat(q, ans)
-        log_activity(st.session_state.user, "CHAT_USED")
+    mode = st.selectbox("Mode", [
+        "Error Fix",
+        "Code Fix",
+        "GitHub Repo Scan"
+    ])
 
+    # ---------------- ERROR ----------------
+    if mode == "Error Fix":
+
+        error = st.text_area("Paste Error")
+
+        if st.button("Analyze"):
+            result = ai_fix_code(error)
+
+            st.markdown("### 🧠 AI OUTPUT")
+            st.write(result)
+
+    # ---------------- CODE FIX ----------------
+    elif mode == "Code Fix":
+
+        code = st.text_area("Paste Code")
+        error = st.text_area("Error")
+
+        if st.button("Auto Fix"):
+            result = ai_fix_code(error, code)
+
+            st.markdown("### 🧾 FIXED RESULT")
+            st.write(result)
+
+    # ---------------- GITHUB ----------------
+    elif mode == "GitHub Repo Scan":
+
+        owner = st.text_input("GitHub Username")
+        repo = st.text_input("Repo Name")
+
+        if st.button("Scan Repo"):
+
+            files = fetch_repo(owner, repo)
+
+            st.subheader("📂 Repo Files")
+
+            for f in files:
+                st.write(f["name"])
 # =====================================================
 # 📊 ANALYTICS
 # =====================================================
