@@ -1,3 +1,7 @@
 streamlit
 pandas
 bcrypt
+reportlab
+scikit-learn
+numpy
+matplotlib
