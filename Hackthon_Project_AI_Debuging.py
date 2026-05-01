@@ -199,10 +199,15 @@ admin_user = st.secrets["ADMIN_USERNAME"]
 
 greet = get_greeting()
 
-if st.session_state.user == admin_user:
-    st.success(f"👑 {greet},Boss {st.session_state.user}! Full system access granted 🚀")
+username = st.session_state.get("user")
+
+if username:
+    if username == admin_user:
+        st.success(f"👑 {greet}, Boss {username}! Full system access granted 🚀")
+    else:
+        st.info(f"👤 {greet}, {username}! Ready to debug smarter? 🚀")
 else:
-    st.info(f"👤 {greet}, {st.session_state.user}! Ready to debug smarter? 🚀")
+    st.warning("⚠ User not detected (session issue)")
 # ---------------- NAV ----------------
 page = st.sidebar.radio("Navigation", [
     "🏠 Dashboard",
