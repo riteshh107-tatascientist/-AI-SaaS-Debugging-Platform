@@ -170,6 +170,10 @@ if not st.session_state.login:
     st.stop()
 
 st.markdown(f"👤 Logged in as: **{st.session_state.user}**")
+if st.sidebar.button("🚪 Logout"):
+    st.session_state.login = False
+    st.session_state.user = None
+    st.rerun()
 
 admin_user = st.secrets["ADMIN_USERNAME"]
 
