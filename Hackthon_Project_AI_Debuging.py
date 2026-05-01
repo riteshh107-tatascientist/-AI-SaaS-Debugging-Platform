@@ -3,7 +3,7 @@ import pandas as pd
 import re
 import time
 from ai_engine import ai_fix_code
-from github_ai import fetch_repo
+from github_ai import fetch_repo_files
 
 from auth import ensure_admin
 
@@ -31,10 +31,11 @@ ensure_admin()
 st.query_params["refresh"] = str(time.time())
 
 # ---------------- SESSION ----------------
-if "login" not in st.session_state:
-    st.session_state.login = False
-if "user" not in st.session_state:
-    st.session_state.user = None
+if "last_deleted" not in st.session_state:
+    st.session_state.last_deleted = None
+
+if "delete_time" not in st.session_state:
+    st.session_state.delete_time = None
 
 # ---------------- ULTRA STYLE ----------------
 st.markdown("""
@@ -262,9 +263,7 @@ elif page == "📄 Log Analyzer":
             </div>
             """, unsafe_allow_html=True)
 
-# =====================================================
-# 💬 AI ASSISTANT
-# =====================================================
+
 # =====================================================
 # 💬 AI ASSISTANT (UPGRADED)
 # =====================================================
@@ -309,12 +308,26 @@ elif page == "💬 AI Assistant":
 
         if st.button("Scan Repo"):
 
-            files = fetch_repo(owner, repo)
+            files = fetch_repo_files(owner, repo)
 
-            st.subheader("📂 Repo Files")
+            if not files:
+                st.error("❌ Repo not found or API error")
 
-            for f in files:
-                st.write(f["name"])
+            else:
+                st.success("✅ Repo Loaded Successfully")
+
+                for f in files:
+
+                    st.subheader(f"📂 {f['name']}")
+
+                    # AI ANALYSIS
+                    ai_result = ai_fix_code(
+                        "Analyze this code and find issues",
+                        f["content"]
+                    )
+
+                    st.markdown("### 🧠 AI Analysis")
+                    st.write(ai_result)
 # =====================================================
 # 📊 ANALYTICS
 # =====================================================
@@ -324,9 +337,8 @@ elif page == "📊 Analytics":
 
     st.dataframe(pd.DataFrame(get_activity(),
                               columns=["User","Action","Time"]))
-
 # =====================================================
-# 👑 ADMIN PANEL (FIXED)
+# 👑 ADMIN PANEL (FIXED + STABLE)
 # =====================================================
 elif page == "👑 Admin Panel":
 
@@ -347,21 +359,73 @@ elif page == "👑 Admin Panel":
 
     col1, col2, col3, col4 = st.columns(4)
 
+    # ---------------- BAN ----------------
     with col1:
         if st.button("Ban"):
-            ban_user(u)
+            if u:
+                ban_user(u)
+                st.toast(f"✅ {u} banned")
+            else:
+                st.warning("⚠ Enter username")
 
+    # ---------------- UNBAN ----------------
     with col2:
         if st.button("Unban"):
-            unban_user(u)
+            if u:
+                unban_user(u)
+                st.toast(f"✅ {u} unbanned")
+            else:
+                st.warning("⚠ Enter username")
 
+    # ---------------- DELETE ----------------
     with col3:
-        if st.button("Delete"):
-            delete_user(u)
+        confirm = st.checkbox("⚠ Confirm Delete", key="delete_confirm")
 
+        if st.button("Delete"):
+            if not confirm:
+                st.warning("⚠ Please confirm delete")
+            elif u:
+                delete_user(u)
+
+                # save for undo
+                st.session_state.last_deleted = u
+                st.session_state.delete_time = time.time()
+
+                st.toast(f"🗑 {u} deleted (Undo available)")
+            else:
+                st.warning("⚠ Enter username")
+
+    # ---------------- RESTORE ----------------
     with col4:
         if st.button("Restore"):
-            restore_user(u)
+            if u:
+                restore_user(u)
+                st.toast(f"♻ {u} restored")
+            else:
+                st.warning("⚠ Enter username")
+
+    # =====================================================
+    # 🔁 UNDO DELETE SYSTEM (SAFE)
+    # =====================================================
+    if st.session_state.get("last_deleted"):
+
+        elapsed = time.time() - st.session_state.get("delete_time", 0)
+
+        if elapsed < 5:
+            st.warning(f"⏳ Undo delete for {st.session_state.last_deleted}")
+
+            if st.button("♻ Undo Delete"):
+                restore_user(st.session_state.last_deleted)
+                st.toast("♻ Restored successfully")
+
+                st.session_state.last_deleted = None
+                st.session_state.delete_time = None
+                st.rerun()
+
+        else:
+            # auto clear after 5 sec
+            st.session_state.last_deleted = None
+            st.session_state.delete_time = None
 
 # ---------------- FOOTER ----------------
 st.markdown("""
