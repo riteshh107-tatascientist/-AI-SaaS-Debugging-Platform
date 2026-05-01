@@ -12,9 +12,11 @@ from mailer import send_alert
 from pdf_report import generate_pdf
 from chat_ui import render_chat
 from datetime import datetime
+import pytz
 
 def get_greeting():
-    hour = datetime.now().hour
+    india = pytz.timezone("Asia/Kolkata")
+    hour = datetime.now(india).hour
 
     if hour < 12:
         return "🌅 Good Morning"
