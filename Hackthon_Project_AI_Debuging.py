@@ -26,6 +26,12 @@ from utils import format_out
 st.set_page_config(page_title="DebugAI Pro", layout="wide")
 create_table()
 ensure_admin()
+# ---------------- SESSION INIT ----------------
+if "login" not in st.session_state:
+    st.session_state.login = False
+
+if "user" not in st.session_state:
+    st.session_state.user = None
 
 # ---------------- AUTO REFRESH ----------------
 st.query_params["refresh"] = str(time.time())
@@ -135,7 +141,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------- AUTH ----------------
-if not st.session_state.login:
+if not st.session_state.get("login", False):
     st.sidebar.title("🔐 Login System")
 
     mode = st.sidebar.selectbox("Select", ["Login", "Signup"])
