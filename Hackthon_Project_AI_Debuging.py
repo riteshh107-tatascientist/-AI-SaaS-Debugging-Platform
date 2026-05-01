@@ -11,6 +11,17 @@ from analytics import get_login_stats
 from mailer import send_alert
 from pdf_report import generate_pdf
 from chat_ui import render_chat
+from datetime import datetime
+
+def get_greeting():
+    hour = datetime.now().hour
+
+    if hour < 12:
+        return "🌅 Good Morning"
+    elif hour < 18:
+        return "☀️ Good Afternoon"
+    else:
+        return "🌙 Good Evening"
 
 from auth import (
     create_table, signup, login,
@@ -135,7 +146,7 @@ st.markdown("""
 # ---------------- HEADER ----------------
 st.markdown("""
 <div class="topbar">
-<span>🚀 DebugAI Pro | AI SaaS Debugging Platform | Real-Time Monitoring | Built by Ritesh</span>
+<span>🏆 TIT SRIJAN 2026 Hackathon Project | DebugAI Pro 🚀 | 24H Innovation → Real-Time AI Debugging System ⚡</span>
 </div>
 <div class="space"></div>
 """, unsafe_allow_html=True)
@@ -184,11 +195,12 @@ if st.sidebar.button("🚪 Logout"):
 
 admin_user = st.secrets["ADMIN_USERNAME"]
 
-if st.session_state.user == admin_user:
-    st.success("👑 Welcome Owner! Full system access granted 🚀")
-else:
-    st.info("👤 Welcome user! Explore the system")
+greet = get_greeting()
 
+if st.session_state.user == admin_user:
+    st.success(f"👑 {greet},Boss {st.session_state.user}! Full system access granted 🚀")
+else:
+    st.info(f"👤 {greet}, {st.session_state.user}! Ready to debug smarter? 🚀")
 # ---------------- NAV ----------------
 page = st.sidebar.radio("Navigation", [
     "🏠 Dashboard",
@@ -436,6 +448,6 @@ elif page == "👑 Admin Panel":
 # ---------------- FOOTER ----------------
 st.markdown("""
 <div class="footer">
-<span>🚀 DebugAI Pro | SaaS AI Platform | Built by Ritesh</span>
+<span>🚀 DebugAI Pro |Real-Time AI Debugging System | Built by Ritesh Kumar Singh & Krishna Chandra Gupta</span>
 </div>
 """, unsafe_allow_html=True)
