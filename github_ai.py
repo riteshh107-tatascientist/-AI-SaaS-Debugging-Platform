@@ -1,6 +1,5 @@
 import requests
 import streamlit as st
-import base64
 
 def fetch_repo_files(owner, repo):
 
@@ -12,29 +11,27 @@ def fetch_repo_files(owner, repo):
         "Authorization": f"token {token}"
     }
 
-    files_data = []
+    res = requests.get(url, headers=headers)
 
-    try:
-        res = requests.get(url, headers=headers, timeout=10)
+    if res.status_code != 200:
+        return []
 
-        if res.status_code != 200:
-            return []
+    files_data = res.json()
+    all_files = []
 
-        files = res.json()
+    for file in files_data:
 
-        for f in files:
-            if f["type"] == "file":
+        if file["type"] == "file" and file["name"].endswith(".py"):
 
-                file_url = f["download_url"]
-                file_res = requests.get(file_url, timeout=10)
+            file_url = file["download_url"]
 
-                if file_res.status_code == 200:
-                    files_data.append({
-                        "name": f["name"],
-                        "content": file_res.text[:2000]   # limit for AI
-                    })
+            content_res = requests.get(file_url)
 
-        return files_data
+            if content_res.status_code == 200:
 
-    except Exception as e:
-        return [{"error": str(e)}]
+                all_files.append({
+                    "name": file["name"],
+                    "content": content_res.text
+                })
+
+    return all_files
